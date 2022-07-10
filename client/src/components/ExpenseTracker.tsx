@@ -42,27 +42,21 @@ const ExpenseTracker = () => {
 
 
   const differncePayment = () => {
-    let difference = 0;
     let rahulAmt = 0;
     let rameshAmt = 0;
-    let payee = '';
 
-    for(let i = 0; i < items.length; i++) {
-        if (items[i].payeeName === 'Rahul') {
-            rahulAmt += items[i].price;
+    items.forEach(item => {
+        if (item.payeeName === 'Rahul') {
+            rahulAmt += item.price;
         } else {
-            rameshAmt += items[i].price;
+            rameshAmt += item.price;
         }
-    }
+    });
 
-    if (rahulAmt > rameshAmt) {
-        difference = (rahulAmt - rameshAmt) / 2 ;
-        payee = 'Ramesh'
-    } else {
-        difference = (rameshAmt - rahulAmt) / 2 ;
-        payee = 'Rahul'
-    }
-        return { difference , payee};
+    return { 
+        difference: Math.abs((rahulAmt - rameshAmt) / 2) , 
+        payee: rahulAmt > rameshAmt ? 'Ramesh' :  'Rahul'
+    };
   };
 
   const handleClose = () => setShow(false);
@@ -96,10 +90,9 @@ const ExpenseTracker = () => {
     return (
         <Container className="my-4">
         <h1>
-            Expense Tracker
-            <Button variant="primary" onClick={handleShow}className="float-end">Add Expense</Button>
+            Expense Tracker            
         </h1>
-
+        <Button variant="primary" onClick={handleShow} className="float-end my-4">Add Expense</Button>
         <Modal show={show} onHide={handleClose}>
             <Modal.Header closeButton>
                 <Modal.Title>Add an expense</Modal.Title>
@@ -125,8 +118,8 @@ const ExpenseTracker = () => {
                         <Form.Control type="number" min="0" ref={priceRef} />
                     </Form.Group>
 
-                    <Button variant="secondary" onClick={handleClose}>Close</Button>
-                    <Button variant="primary" type="submit">Add Expense</Button>
+                    <Button variant="primary" type="submit" className="me-2">Add Expense</Button>
+                    <Button variant="danger" onClick={handleClose} className="me-2">Close</Button>                    
                 </Form>
             </Modal.Body>
       </Modal>
@@ -149,7 +142,7 @@ const ExpenseTracker = () => {
             !loading && !error && (
 <Table striped bordered hover>
       <thead>
-        <tr>
+        <tr className="bg-secondary">
           <th>Sr. No.</th>
           <th>Payee</th>
           <th>Description</th>
@@ -163,7 +156,10 @@ const ExpenseTracker = () => {
                         (item, idx) => (
                             <tr key={item.id}>
                                 <td>{idx +1}</td>
-                                <td>{item.payeeName}</td>
+                                <td className={
+                                    item.payeeName === 'Rahul' ?
+                                    'bg-primary' : 'bg-info'
+                                }>{item.payeeName}</td>
                                 <td>{item.product}</td>
                                 <td>{item.setDate}</td>
                                 <td className="font-monospace text-end">&#8377;{item.price}</td>
@@ -172,16 +168,20 @@ const ExpenseTracker = () => {
                     )
                 }
                 <tr>
-                    <td colSpan={4} className="text-end"><strong>Rahul Paid</strong></td>
-                    <td className="font-monospace text-end"><strong>&#8377;{totalByPayee('Rahul')}</strong></td>
+                    <td colSpan={4} className="text-end bg-success"><strong>Total</strong></td>
+                    <td className="font-monospace text-end bg-success"><strong>&#8377;{items.reduce((total,item) => total+item.price,0) }</strong></td>
                 </tr>
                 <tr>
-                    <td colSpan={4} className="text-end"><strong>Ramesh Paid</strong></td>
-                    <td className="font-monospace text-end"><strong>&#8377;{totalByPayee('Ramesh')}</strong></td>
+                    <td colSpan={4} className="text-end bg-primary"><strong>Rahul Paid</strong></td>
+                    <td className="font-monospace text-end bg-primary"><strong>&#8377;{totalByPayee('Rahul')}</strong></td>
                 </tr>
                 <tr>
-                    <td colSpan={4} className="text-end"><strong>{differncePayment().payee} has to pay </strong></td>
-                    <td className="font-monospace text-end"><strong>&#8377;{differncePayment().difference.toFixed(2)}</strong></td>
+                    <td colSpan={4} className="text-end bg-info"><strong>Ramesh Paid</strong></td>
+                    <td className="font-monospace text-end bg-info"><strong>&#8377;{totalByPayee('Ramesh')}</strong></td>
+                </tr>
+                <tr>
+                    <td colSpan={4} className="text-end bg-warning"><strong>{differncePayment().payee} has to pay </strong></td>
+                    <td className="font-monospace text-end bg-warning"><strong>&#8377;{differncePayment().difference.toFixed(2)}</strong></td>
                 </tr>
                 </tbody>
             </Table>
