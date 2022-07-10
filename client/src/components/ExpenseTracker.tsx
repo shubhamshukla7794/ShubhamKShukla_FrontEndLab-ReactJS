@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
-import {Container, Spinner, Alert, Table, Button, Modal } from 'react-bootstrap';
+import { useState, useEffect, useRef, FormEvent } from "react";
+import {Container, Spinner, Alert, Table, Button, Modal, Form } from 'react-bootstrap';
 import IItem from "../models/IItem";
-import { getItems } from "../services/items";
+import { addItem, getItems } from "../services/items";
 
 
 const ExpenseTracker = () => {
@@ -68,6 +68,27 @@ const ExpenseTracker = () => {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
+  const payeeNameRef = useRef<HTMLSelectElement>( null );
+  const productRef = useRef<HTMLInputElement>( null );
+  const priceRef = useRef<HTMLInputElement>( null );
+
+  const addExpense = async ( event : FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const expense = {
+        payeeName: payeeNameRef?.current?.value as string,
+        product: productRef?.current?.value as string,
+        price: parseFloat(priceRef?.current?.value as string) as number,
+        setDate: ((new Date()).toISOString().substring(0,10)) as string
+    } as Omit<IItem, 'id'>;
+
+    const updatedItem = await addItem( expense );
+    console.log ( updatedItem);
+
+    handleClose();
+
+  };
+
     return (
         <Container className="my-4">
         <h1>
@@ -76,18 +97,34 @@ const ExpenseTracker = () => {
         </h1>
 
         <Modal show={show} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Modal heading</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>Woohoo, you're reading this text in a modal!</Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={handleClose}>
-            Save Changes
-          </Button>
-        </Modal.Footer>
+            <Modal.Header closeButton>
+                <Modal.Title>Add an expense</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <Form onSubmit={addExpense}>
+                    <Form.Group className="mb-3" controlId="payeeName">
+                        <Form.Label>Who Paid?</Form.Label>
+                        <Form.Select aria-label="Payee name" ref={payeeNameRef}>
+                            <option>--Select payee--</option>
+                            <option value="Rahul">Rahul</option>
+                            <option value="Ramesh">Ramesh</option>
+                        </Form.Select>
+                    </Form.Group>
+
+                    <Form.Group className="mb-3" controlId="product">
+                        <Form.Label>What for?</Form.Label>
+                        <Form.Control type="text" placeholder="Enter decription" ref={productRef} />
+                    </Form.Group>
+
+                    <Form.Group className="mb-3" controlId="price">
+                        <Form.Label>How Much?</Form.Label>
+                        <Form.Control type="number" min="0" ref={priceRef} />
+                    </Form.Group>
+
+                    <Button variant="secondary" onClick={handleClose}>Close</Button>
+                    <Button variant="primary" type="submit">Add Expense</Button>
+                </Form>
+            </Modal.Body>
       </Modal>
         
         {
@@ -137,6 +174,10 @@ const ExpenseTracker = () => {
                 <tr>
                     <td colSpan={4} className="text-end"><strong>Ramesh Paid</strong></td>
                     <td className="font-monospace text-end"><strong>&#8377;{totalByPayee('Ramesh')}</strong></td>
+                </tr>
+                <tr>
+                    <td colSpan={4} className="text-end"><strong>{differncePayment().payee} has to pay </strong></td>
+                    <td className="font-monospace text-end"><strong>&#8377;{differncePayment().difference.toFixed(2)}</strong></td>
                 </tr>
                 </tbody>
             </Table>

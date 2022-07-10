@@ -10,6 +10,17 @@ const getItems = async () => {
     return response.data;
 }
 
+const addItem = async ( item : Omit<IItem, 'id'>) => {
+    const response = await axios.post<IItem>(`${baseURL}/items`, item, {
+        headers: {
+            'Content-Type': 'application/json' 
+        }
+    });
+
+    return response.data;
+};
+
 export {
-    getItems
+    getItems,
+    addItem
 };
