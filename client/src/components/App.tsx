@@ -1,5 +1,7 @@
 import ExpenseTracker from "./ExpenseTracker";
 
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 function App() {
 
   return (
