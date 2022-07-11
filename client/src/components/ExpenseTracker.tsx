@@ -140,17 +140,17 @@ const ExpenseTracker = () => {
         } 
         {
             !loading && !error && (
-<Table striped bordered hover>
-      <thead>
-        <tr className="bg-secondary">
-          <th>Sr. No.</th>
-          <th>Payee</th>
-          <th>Description</th>
-          <th>Date</th>
-          <th className="text-end">Amount</th>
-        </tr>
-      </thead>
-      <tbody>
+            <Table striped bordered hover>
+                <thead>
+                    <tr className="bg-secondary">
+                    <th>Sr. No.</th>
+                    <th>Payee</th>
+                    <th>Description</th>
+                    <th>Date</th>
+                    <th className="text-end">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
                 {
                     items.map (
                         (item, idx) => (
